@@ -38,6 +38,9 @@ pub trait StableVecAccess<Data, Index> {
     /// Get a mutable reference to the element at the given index.
     /// If the index is invalid, an [`Error::InvalidIndex`](crate::error::Error::InvalidIndex) is returned.
     fn get_mut(&mut self, index: Index) -> Result<&mut Data>;
+
+    /// Return the number of elements in the stable vector.
+    fn len(&self) -> usize;
 }
 
 /// The interface that describes the index type of a stable vector.

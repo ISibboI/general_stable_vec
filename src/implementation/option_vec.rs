@@ -77,6 +77,10 @@ impl<Data, Index: StableVecIndex> StableVecAccess<Data, Index> for OptionStableV
             _ => Err(Error::InvalidIndex { index }),
         }
     }
+
+    fn len(&self) -> usize {
+        self.vec.len() - self.free_list.len()
+    }
 }
 
 impl<Data, Index> Default for OptionStableVec<Data, Index> {
