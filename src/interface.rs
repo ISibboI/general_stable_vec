@@ -41,6 +41,11 @@ pub trait StableVecAccess<Data, Index> {
 
     /// Return the number of elements in the stable vector.
     fn len(&self) -> usize;
+
+    /// Returns true if the stable vector is empty.
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 /// The interface that describes the index type of a stable vector.
