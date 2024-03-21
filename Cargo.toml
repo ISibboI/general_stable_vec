@@ -1,6 +1,7 @@
 [package]
 name = "general_stable_vec"
 description = "A Vec implementation with stable indices"
+repository = "https://github.com/ISibboI/general_stable_vec"
 version = "0.1.0"
 edition = "2021"
 license = "BSD-2-Clause"
