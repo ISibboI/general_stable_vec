@@ -4,6 +4,7 @@ description = "A Vec implementation with stable indices"
 repository = "https://github.com/ISibboI/general_stable_vec"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.75.0"
 license = "BSD-2-Clause"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
