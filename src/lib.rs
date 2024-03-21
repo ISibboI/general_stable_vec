@@ -5,4 +5,5 @@
 #![warn(missing_docs)]
 
 pub mod error;
+pub mod implementation;
 pub mod interface;

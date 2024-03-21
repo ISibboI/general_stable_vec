@@ -39,3 +39,6 @@ pub trait StableVecAccess<Data, Index> {
     /// If the index is invalid, an [`Error::InvalidIndex`](crate::error::Error::InvalidIndex) is returned.
     fn get_mut(&mut self, index: Index) -> Result<&mut Data>;
 }
+
+/// The interface that describes the index type of a stable vector.
+pub trait StableVecIndex: From<usize> + Into<usize> {}
