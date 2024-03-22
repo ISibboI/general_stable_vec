@@ -43,6 +43,18 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         index.into()
     }
 
+    fn insert_in_place(&mut self, constructor: impl FnOnce(Index) -> Data) -> Index {
+        let index = self.free_list.pop().unwrap_or(self.vec.len());
+        let element = constructor(index.into());
+
+        if index < self.vec.len() {
+            self.vec[index] = Some(element);
+        } else {
+            self.vec.push(Some(element));
+        }
+        index.into()
+    }
+
     fn remove(&mut self, index: Index) -> crate::error::Result<Data> {
         let index = index.into();
         if index < self.vec.len() {

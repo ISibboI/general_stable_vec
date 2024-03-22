@@ -4,11 +4,16 @@ use crate::error::Result;
 
 /// The interface that defines the full functionality of a stable vector.
 pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> {
-    /// Insert a single item into the stable vector at an arbitrary index.
+    /// Insert a single element into the stable vector at an arbitrary index.
     /// Return the index.
     fn insert(&mut self, element: Data) -> Index;
 
-    /// Insert multiple items into the stable vector at arbitrary indices.
+    /// Insert a single element into the stable vector by constructing it in place.
+    /// This method allows to create the element while already knowing its index.
+    /// Returns the index.
+    fn insert_in_place(&mut self, constructor: impl FnOnce(Index) -> Data) -> Index;
+
+    /// Insert multiple elements into the stable vector at arbitrary indices.
     /// The indices are returned as an iterator in the order of the inserted elements.
     ///
     /// **Warning**: the returned iterator must be completely exhausted in order to insert all elements.
@@ -18,6 +23,22 @@ pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> {
         elements: impl IntoIterator<Item = Data>,
     ) -> impl Iterator<Item = Index> {
         elements.into_iter().map(|element| self.insert(element))
+    }
+
+    /// Insert multiple elements into the stable vector at arbitrary indices.
+    /// The elements are constructed in place, which allows to create them while already knowing their indices.
+    /// The indices are returned as an iterator in the order of the inserted elements.
+    ///
+    /// **Warning**: the returned iterator must be completely exhausted in order to insert all elements.
+    #[must_use = "this iterator must be completely exhausted in order to insert all elements"]
+
+    fn insert_in_place_from_iter(
+        &mut self,
+        elements: impl IntoIterator<Item = impl FnOnce(Index) -> Data>,
+    ) -> impl Iterator<Item = Index> {
+        elements
+            .into_iter()
+            .map(|constructor| self.insert_in_place(constructor))
     }
 
     /// Remove and return the element at the given index.
