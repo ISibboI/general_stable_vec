@@ -11,6 +11,17 @@ pub enum Error {
         /// The index.
         index: usize,
     },
+
+    /// The given index is not the next available insertion index.
+    #[error(
+        "The given index {actual_index} is not the next available insertion index {expected_index}"
+    )]
+    NotTheNextAvailableInsertionIndex {
+        /// The expected next available insertion index.
+        expected_index: usize,
+        /// The given invalid insertion index.
+        actual_index: usize,
+    },
 }
 
 /// A shortcut result type using this crate's error type.

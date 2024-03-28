@@ -13,6 +13,11 @@ pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> {
     /// Returns the index.
     fn insert_in_place(&mut self, constructor: impl FnOnce(Index) -> Data) -> Index;
 
+    /// Inserts a single element into the stable vector at the given index.
+    /// The index must be the first index in the iterator returned by [available_insertion_index_iterator](StableVec::available_insertion_index_iterator).
+    /// If a different index is given, an [`Error::NotTheNextAvailableInsertionIndex`](crate::error::Error::NotTheNextAvailableInsertionIndex) is returned.
+    fn insert_at(&mut self, index: Index, element: Data) -> crate::error::Result<()>;
+
     /// Insert multiple elements into the stable vector at arbitrary indices.
     /// The indices are returned as an iterator in the order of the inserted elements.
     ///
@@ -44,6 +49,11 @@ pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> {
     /// Remove and return the element at the given index.
     /// If the index is invalid, an [`Error::InvalidIndex`](crate::error::Error::InvalidIndex) is returned.
     fn remove(&mut self, index: Index) -> Result<Data>;
+
+    /// Returns an iterator that iterates over the available insertion indices in this stable vector.
+    /// These are the "holes" in the underlying vector,
+    /// followed by the indices after the end of the underlying vector.
+    fn available_insertion_index_iterator(&self) -> impl Iterator<Item = Index>;
 
     /// Delete all elements from the stable vector.
     fn clear(&mut self);

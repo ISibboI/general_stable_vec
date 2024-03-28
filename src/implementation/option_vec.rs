@@ -9,6 +9,10 @@ use crate::{
     interface::{StableVec, StableVecAccess, StableVecIndex},
 };
 
+pub use available_insertion_index_iterator::AvailableInsertionIndexIterator;
+
+mod available_insertion_index_iterator;
+
 /// A stable vector based on the [`Option`] type with a free list.
 /// Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 /// This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
@@ -55,6 +59,21 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         index.into()
     }
 
+    fn insert_at(&mut self, index: Index, element: Data) -> crate::error::Result<()> {
+        let expected_index = self.free_list.last().copied().unwrap_or(self.vec.len());
+        let index = index.into();
+        if expected_index == index {
+            let inserted_index = self.insert(element);
+            assert_eq!(inserted_index.into(), index);
+            Ok(())
+        } else {
+            Err(Error::NotTheNextAvailableInsertionIndex {
+                expected_index,
+                actual_index: index,
+            })
+        }
+    }
+
     fn remove(&mut self, index: Index) -> crate::error::Result<Data> {
         let index = index.into();
         if index < self.vec.len() {
@@ -65,6 +84,10 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         } else {
             Err(Error::InvalidIndex { index })
         }
+    }
+
+    fn available_insertion_index_iterator(&self) -> impl Iterator<Item = Index> {
+        AvailableInsertionIndexIterator::new(self.free_list.clone(), self.vec.len())
     }
 
     fn clear(&mut self) {
