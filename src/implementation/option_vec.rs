@@ -100,3 +100,21 @@ impl<Data, Index> Default for OptionStableVec<Data, Index> {
         Self::new()
     }
 }
+
+impl<Data: Clone, Index> Clone for OptionStableVec<Data, Index> {
+    fn clone(&self) -> Self {
+        Self {
+            vec: self.vec.clone(),
+            free_list: self.free_list.clone(),
+            phantom_data: self.phantom_data,
+        }
+    }
+}
+
+impl<Data: Eq, Index> PartialEq for OptionStableVec<Data, Index> {
+    fn eq(&self, other: &Self) -> bool {
+        self.vec == other.vec
+    }
+}
+
+impl<Data: Eq, Index> Eq for OptionStableVec<Data, Index> {}
