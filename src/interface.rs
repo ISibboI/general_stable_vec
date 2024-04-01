@@ -8,6 +8,15 @@ pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> {
     /// Return the index.
     fn insert(&mut self, element: Data) -> Index;
 
+    /// Insert the default value for a single element into the stable vector at an arbitrary index.
+    /// Return the index.
+    fn insert_default(&mut self) -> Index
+    where
+        Data: Default,
+    {
+        self.insert(Default::default())
+    }
+
     /// Insert a single element into the stable vector by constructing it in place.
     /// This method allows to create the element while already knowing its index.
     /// Returns the index.
