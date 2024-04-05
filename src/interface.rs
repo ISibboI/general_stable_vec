@@ -62,7 +62,9 @@ pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> {
     /// Returns an iterator that iterates over the available insertion indices in this stable vector.
     /// These are the "holes" in the underlying vector,
     /// followed by the indices after the end of the underlying vector.
-    fn available_insertion_index_iterator(&self) -> impl Iterator<Item = Index>;
+    fn available_insertion_index_iterator<'result>(&self) -> impl 'result + Iterator<Item = Index>
+    where
+        Index: 'result;
 
     /// Delete all elements from the stable vector.
     fn clear(&mut self);

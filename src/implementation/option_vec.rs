@@ -86,7 +86,10 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         }
     }
 
-    fn available_insertion_index_iterator(&self) -> impl Iterator<Item = Index> {
+    fn available_insertion_index_iterator<'result>(&self) -> impl 'result + Iterator<Item = Index>
+    where
+        Index: 'result,
+    {
         AvailableInsertionIndexIterator::new(self.free_list.clone(), self.vec.len())
     }
 
