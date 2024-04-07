@@ -3,7 +3,9 @@
 use crate::error::Result;
 
 /// The interface that defines the full functionality of a stable vector.
-pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> + From<Vec<Data>> {
+pub trait StableVec<Data, Index>:
+    StableVecAccess<Data, Index> + From<Vec<Data>> + IntoIterator<Item = Data>
+{
     /// Insert a single element into the stable vector at an arbitrary index.
     /// Return the index.
     fn insert(&mut self, element: Data) -> Index;
@@ -70,6 +72,9 @@ pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> + From<Vec<Data>>
     fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
     where
         Data: 'this;
+
+    /// Remove all elements `e` for which `f(&e)` returns `false`.
+    fn retain(&mut self, f: impl FnMut(&Data) -> bool);
 
     /// Delete all elements from the stable vector.
     fn clear(&mut self);

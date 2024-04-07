@@ -2,7 +2,7 @@
 //! Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 //! This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
 
-use std::marker::PhantomData;
+use std::{iter, marker::PhantomData, vec};
 
 use crate::{
     error::Error,
@@ -93,16 +93,26 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         AvailableInsertionIndexIterator::new(self.free_list.clone(), self.vec.len())
     }
 
-    fn clear(&mut self) {
-        self.vec.clear();
-        self.free_list.clear();
-    }
-
     fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
     where
         Data: 'this,
     {
         self.vec.iter().filter_map(Option::as_ref)
+    }
+
+    fn retain(&mut self, mut f: impl FnMut(&Data) -> bool) {
+        for index in 0..self.vec.len() {
+            if let Some(element) = self.vec[index].as_ref() {
+                if !f(element) {
+                    self.remove(index.into()).unwrap();
+                }
+            }
+        }
+    }
+
+    fn clear(&mut self) {
+        self.vec.clear();
+        self.free_list.clear();
     }
 }
 
@@ -159,5 +169,14 @@ impl<Data, Index> From<Vec<Data>> for OptionStableVec<Data, Index> {
             free_list: Default::default(),
             phantom_data: Default::default(),
         }
+    }
+}
+
+impl<Data, Index> IntoIterator for OptionStableVec<Data, Index> {
+    type Item = Data;
+    type IntoIter = iter::Flatten<vec::IntoIter<Option<Data>>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.vec.into_iter().flatten()
     }
 }
