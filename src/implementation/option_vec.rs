@@ -164,11 +164,7 @@ impl<Data: Eq, Index> Eq for OptionStableVec<Data, Index> {}
 
 impl<Data, Index> From<Vec<Data>> for OptionStableVec<Data, Index> {
     fn from(value: Vec<Data>) -> Self {
-        Self {
-            vec: value.into_iter().map(Some).collect(),
-            free_list: Default::default(),
-            phantom_data: Default::default(),
-        }
+        value.into_iter().collect()
     }
 }
 
@@ -178,5 +174,15 @@ impl<Data, Index> IntoIterator for OptionStableVec<Data, Index> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.vec.into_iter().flatten()
+    }
+}
+
+impl<Data, Index> FromIterator<Data> for OptionStableVec<Data, Index> {
+    fn from_iter<T: IntoIterator<Item = Data>>(iter: T) -> Self {
+        Self {
+            vec: iter.into_iter().map(Some).collect(),
+            free_list: Default::default(),
+            phantom_data: Default::default(),
+        }
     }
 }
