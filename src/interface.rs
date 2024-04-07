@@ -66,6 +66,11 @@ pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> + From<Vec<Data>>
     where
         Index: 'result;
 
+    /// Return an iterator over the elements in this stable vec.
+    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
+    where
+        Data: 'this;
+
     /// Delete all elements from the stable vector.
     fn clear(&mut self);
 }

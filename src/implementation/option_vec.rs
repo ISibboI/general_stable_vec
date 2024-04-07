@@ -97,6 +97,13 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         self.vec.clear();
         self.free_list.clear();
     }
+
+    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
+    where
+        Data: 'this,
+    {
+        self.vec.iter().filter_map(Option::as_ref)
+    }
 }
 
 impl<Data, Index: StableVecIndex> StableVecAccess<Data, Index> for OptionStableVec<Data, Index> {
