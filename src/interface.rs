@@ -3,7 +3,7 @@
 use crate::error::Result;
 
 /// The interface that defines the full functionality of a stable vector.
-pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> {
+pub trait StableVec<Data, Index>: StableVecAccess<Data, Index> + From<Vec<Data>> {
     /// Insert a single element into the stable vector at an arbitrary index.
     /// Return the index.
     fn insert(&mut self, element: Data) -> Index;

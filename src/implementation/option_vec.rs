@@ -144,3 +144,13 @@ impl<Data: Eq, Index> PartialEq for OptionStableVec<Data, Index> {
 }
 
 impl<Data: Eq, Index> Eq for OptionStableVec<Data, Index> {}
+
+impl<Data, Index> From<Vec<Data>> for OptionStableVec<Data, Index> {
+    fn from(value: Vec<Data>) -> Self {
+        Self {
+            vec: value.into_iter().map(Some).collect(),
+            free_list: Default::default(),
+            phantom_data: Default::default(),
+        }
+    }
+}
