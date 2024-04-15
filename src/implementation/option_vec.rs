@@ -193,9 +193,15 @@ impl<Data: Debug, Index: StableVecIndex> Debug for OptionStableVec<Data, Index> 
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "OptionStableVec [")?;
 
+        let mut once = false;
         for (index, element) in self.vec.iter().enumerate() {
             let Some(element) = element else { continue };
-            write!(f, "({index}, {element:?}")?;
+            if once {
+                write!(f, ", ")?;
+            } else {
+                once = true;
+            }
+            write!(f, "({index}, {element:?})")?;
         }
 
         write!(f, "]")
