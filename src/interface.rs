@@ -69,7 +69,7 @@ pub trait StableVec<Data, Index>:
         Index: 'result;
 
     /// Return an iterator over the elements in this stable vec.
-    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
+    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = (Index, &Data)>
     where
         Data: 'this;
 

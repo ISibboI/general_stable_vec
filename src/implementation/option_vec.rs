@@ -92,11 +92,14 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         AvailableInsertionIndexIterator::new(self.free_list.clone(), self.vec.len())
     }
 
-    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
+    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = (Index, &Data)>
     where
         Data: 'this,
     {
-        self.vec.iter().filter_map(Option::as_ref)
+        self.vec
+            .iter()
+            .enumerate()
+            .filter_map(|(index, element)| element.as_ref().map(|element| (index.into(), element)))
     }
 
     fn retain(&mut self, mut f: impl FnMut(&Data) -> bool) {
