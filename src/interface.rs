@@ -68,10 +68,26 @@ pub trait StableVec<Data, Index>:
     where
         Index: 'result;
 
-    /// Return an iterator over the elements in this stable vec.
+    /// Return an iterator over the pairs of (index, element) in this stable vec.
     fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = (Index, &Data)>
     where
         Data: 'this;
+
+    /// Return an iterator over the elements in this stable vec.
+    fn iter_elements<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
+    where
+        Data: 'this,
+    {
+        self.iter().map(|(_, element)| element)
+    }
+
+    /// Return an iterator over the indices that are currently valid for this stable vec.
+    fn iter_indices<'this>(&'this self) -> impl '_ + Iterator<Item = Index>
+    where
+        Data: 'this,
+    {
+        self.iter().map(|(index, _)| index)
+    }
 
     /// Remove all elements `e` for which `f(&e)` returns `false`.
     fn retain(&mut self, f: impl FnMut(&Data) -> bool);
