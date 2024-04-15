@@ -2,7 +2,7 @@
 //! Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 //! This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
 
-use std::{iter, marker::PhantomData, vec};
+use std::{fmt::Debug, iter, marker::PhantomData, vec};
 
 use crate::{
     error::Error,
@@ -16,7 +16,6 @@ mod available_insertion_index_iterator;
 /// A stable vector based on the [`Option`] type with a free list.
 /// Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 /// This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
-#[derive(Debug)]
 pub struct OptionStableVec<Data, Index> {
     vec: Vec<Option<Data>>,
     free_list: Vec<usize>,
@@ -184,5 +183,18 @@ impl<Data, Index> FromIterator<Data> for OptionStableVec<Data, Index> {
             free_list: Default::default(),
             phantom_data: Default::default(),
         }
+    }
+}
+
+impl<Data: Debug, Index: StableVecIndex> Debug for OptionStableVec<Data, Index> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "OptionStableVec [")?;
+
+        for (index, element) in self.vec.iter().enumerate() {
+            let Some(element) = element else { continue };
+            write!(f, "({index}, {element:?}")?;
+        }
+
+        write!(f, "]")
     }
 }
