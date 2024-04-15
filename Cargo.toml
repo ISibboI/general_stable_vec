@@ -2,7 +2,7 @@
 name = "general_stable_vec"
 description = "A Vec implementation with stable indices"
 repository = "https://github.com/ISibboI/general_stable_vec"
-version = "0.9.1"
+version = "0.10.0"
 edition = "2021"
 rust-version = "1.75.0"
 license = "BSD-2-Clause"
