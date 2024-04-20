@@ -73,15 +73,35 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         }
     }
 
+    fn insert_at_arbitrary_index(
+        &mut self,
+        index: Index,
+        element: Data,
+    ) -> crate::error::Result<()> {
+        let index = index.into();
+        if index >= self.vec.len() {
+            self.free_list.extend(self.vec.len()..index);
+            self.vec.resize_with(index + 1, || None);
+            self.vec[index] = Some(element);
+            Ok(())
+        } else if self.vec[index].is_some() {
+            Err(Error::IndexAlreadyInUse { index })
+        } else {
+            self.vec[index] = Some(element);
+            self.free_list.retain(|&free_index| free_index != index);
+            Ok(())
+        }
+    }
+
     fn remove(&mut self, index: Index) -> crate::error::Result<Data> {
         let index = index.into();
         if index < self.vec.len() {
             let element = Option::take(self.vec.get_mut(index).unwrap())
-                .ok_or(Error::InvalidIndex { index })?;
+                .ok_or(Error::UnmappedIndex { index })?;
             self.free_list.push(index);
             Ok(element)
         } else {
-            Err(Error::InvalidIndex { index })
+            Err(Error::UnmappedIndex { index })
         }
     }
 
@@ -123,7 +143,7 @@ impl<Data, Index: StableVecIndex> StableVecAccess<Data, Index> for OptionStableV
         let index = index.into();
         match self.vec.get(index) {
             Some(Some(element)) => Ok(element),
-            _ => Err(Error::InvalidIndex { index }),
+            _ => Err(Error::UnmappedIndex { index }),
         }
     }
 
@@ -131,7 +151,7 @@ impl<Data, Index: StableVecIndex> StableVecAccess<Data, Index> for OptionStableV
         let index = index.into();
         match self.vec.get_mut(index) {
             Some(Some(element)) => Ok(element),
-            _ => Err(Error::InvalidIndex { index }),
+            _ => Err(Error::UnmappedIndex { index }),
         }
     }
 

@@ -29,6 +29,17 @@ pub trait StableVec<Data, Index>:
     /// If a different index is given, an [`Error::NotTheNextAvailableInsertionIndex`](crate::error::Error::NotTheNextAvailableInsertionIndex) is returned.
     fn insert_at(&mut self, index: Index, element: Data) -> crate::error::Result<()>;
 
+    /// Inserts a single element into the stable vector at the given index.
+    /// This index may be any index that is not currently in use.
+    /// If an index that is already mapped to an element is given, an [`Error::IndexAlreadyInUse`](crate::error::Error::IndexAlreadyInUse) is returned.
+    ///
+    /// **WARNING:** this method may be slower than expected, because it may for example need to update a free list.
+    fn insert_at_arbitrary_index(
+        &mut self,
+        index: Index,
+        element: Data,
+    ) -> crate::error::Result<()>;
+
     /// Insert multiple elements into the stable vector at arbitrary indices.
     /// The indices are returned as an iterator in the order of the inserted elements.
     ///
@@ -58,7 +69,7 @@ pub trait StableVec<Data, Index>:
     }
 
     /// Remove and return the element at the given index.
-    /// If the index is invalid, an [`Error::InvalidIndex`](crate::error::Error::InvalidIndex) is returned.
+    /// If the index is not mapped to any element, an [`Error::UnmappedIndex`](crate::error::Error::UnmappedIndex) is returned.
     fn remove(&mut self, index: Index) -> Result<Data>;
 
     /// Returns an iterator that iterates over the available insertion indices in this stable vector.
@@ -100,11 +111,11 @@ pub trait StableVec<Data, Index>:
 /// This is separate from the [`StableVec`] trait to allow creating views of a stable vector that do not allow insertion or deletion, but still grants mutable access to contained elements.
 pub trait StableVecAccess<Data, Index> {
     /// Get a reference to the element at the given index.
-    /// If the index is invalid, an [`Error::InvalidIndex`](crate::error::Error::InvalidIndex) is returned.
+    /// If the index is not mapped to an element, an [`Error::UnmappedIndex`](crate::error::Error::UnmappedIndex) is returned.
     fn get(&self, index: Index) -> Result<&Data>;
 
     /// Get a mutable reference to the element at the given index.
-    /// If the index is invalid, an [`Error::InvalidIndex`](crate::error::Error::InvalidIndex) is returned.
+    /// If the index is not mapped to an element, an [`Error::UnmappedIndex`](crate::error::Error::UnmappedIndex) is returned.
     fn get_mut(&mut self, index: Index) -> Result<&mut Data>;
 
     /// Return the number of elements in the stable vector.

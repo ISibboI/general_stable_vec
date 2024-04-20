@@ -5,9 +5,16 @@ use thiserror::Error;
 /// The error type.
 #[derive(Debug, Error)]
 pub enum Error {
-    /// The given index is not mapped to any data item.
-    #[error("the given index {index} is not mapped to any data item")]
-    InvalidIndex {
+    /// The given index is not mapped to any element.
+    #[error("the given index {index} is not mapped to any element")]
+    UnmappedIndex {
+        /// The index.
+        index: usize,
+    },
+
+    /// The given index is already mapped to an element.
+    #[error("the given index {index} is already mapped to an element")]
+    IndexAlreadyInUse {
         /// The index.
         index: usize,
     },
