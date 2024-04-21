@@ -1,9 +1,11 @@
 //! The interfaces that describe a stable vector.
 
+use std::mem;
+
 use crate::error::Result;
 
 /// The interface that defines the full functionality of a stable vector.
-pub trait StableVec<Data, Index>:
+pub trait StableVec<Data, Index: StableVecIndex>:
     StableVecAccess<Data, Index> + From<Vec<Data>> + IntoIterator<Item = Data> + FromIterator<Data>
 {
     /// Insert a single element into the stable vector at an arbitrary index.
@@ -39,6 +41,21 @@ pub trait StableVec<Data, Index>:
         index: Index,
         element: Data,
     ) -> crate::error::Result<()>;
+
+    /// Sets the index to the given value.
+    /// If the index was already mapped to a value, the old value is returned.
+    /// Otherwise, the given value is newly inserted.
+    fn set(&mut self, index: Index, mut element: Data) -> Option<Data> {
+        let index: usize = index.into();
+        if let Ok(existing_element) = self.get_mut(index.into()) {
+            mem::swap(&mut element, existing_element);
+            Some(element)
+        } else {
+            self.insert_at_arbitrary_index(index.into(), element)
+                .unwrap();
+            None
+        }
+    }
 
     /// Insert multiple elements into the stable vector at arbitrary indices.
     /// The indices are returned as an iterator in the order of the inserted elements.
