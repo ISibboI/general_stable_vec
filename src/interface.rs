@@ -101,12 +101,25 @@ pub trait StableVec<Data, Index: StableVecIndex>:
     where
         Data: 'this;
 
+    /// Return an iterator over the pairs of (index, element) in this stable vec.
+    fn iter_mut<'this>(&'this mut self) -> impl '_ + Iterator<Item = (Index, &mut Data)>
+    where
+        Data: 'this;
+
     /// Return an iterator over the elements in this stable vec.
     fn iter_elements<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
     where
         Data: 'this,
     {
         self.iter().map(|(_, element)| element)
+    }
+
+    /// Return an iterator over the elements in this stable vec.
+    fn iter_elements_mut<'this>(&'this mut self) -> impl '_ + Iterator<Item = &mut Data>
+    where
+        Data: 'this,
+    {
+        self.iter_mut().map(|(_, element)| element)
     }
 
     /// Return an iterator over the indices that are currently valid for this stable vec.

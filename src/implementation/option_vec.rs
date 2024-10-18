@@ -122,6 +122,16 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
             .filter_map(|(index, element)| element.as_ref().map(|element| (index.into(), element)))
     }
 
+    fn iter_mut<'this>(&'this mut self) -> impl '_ + Iterator<Item = (Index, &mut Data)>
+    where
+        Data: 'this,
+    {
+        self.vec
+            .iter_mut()
+            .enumerate()
+            .filter_map(|(index, element)| element.as_mut().map(|element| (index.into(), element)))
+    }
+
     fn retain(&mut self, mut f: impl FnMut(&Data) -> bool) {
         for index in 0..self.vec.len() {
             if let Some(element) = self.vec[index].as_ref() {
