@@ -1,4 +1,5 @@
 //! A stable vector based on the [`Option`] type.
+//!
 //! Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 //! This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
 
@@ -14,6 +15,7 @@ pub use available_insertion_index_iterator::AvailableInsertionIndexIterator;
 mod available_insertion_index_iterator;
 
 /// A stable vector based on the [`Option`] type with a free list.
+///
 /// Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 /// This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
 pub struct OptionStableVec<Data, Index> {
@@ -112,7 +114,7 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
         AvailableInsertionIndexIterator::new(self.free_list.clone(), self.vec.len())
     }
 
-    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = (Index, &Data)>
+    fn iter<'this>(&'this self) -> impl 'this + Iterator<Item = (Index, &'this Data)>
     where
         Data: 'this,
     {
@@ -122,7 +124,7 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
             .filter_map(|(index, element)| element.as_ref().map(|element| (index.into(), element)))
     }
 
-    fn iter_mut<'this>(&'this mut self) -> impl '_ + Iterator<Item = (Index, &mut Data)>
+    fn iter_mut<'this>(&'this mut self) -> impl 'this + Iterator<Item = (Index, &'this mut Data)>
     where
         Data: 'this,
     {

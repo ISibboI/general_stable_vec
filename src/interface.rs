@@ -75,7 +75,6 @@ pub trait StableVec<Data, Index: StableVecIndex>:
     ///
     /// **Warning**: the returned iterator must be completely exhausted in order to insert all elements.
     #[must_use = "this iterator must be completely exhausted in order to insert all elements"]
-
     fn insert_in_place_from_iter(
         &mut self,
         elements: impl IntoIterator<Item = impl FnOnce(Index) -> Data>,
@@ -97,17 +96,17 @@ pub trait StableVec<Data, Index: StableVecIndex>:
         Index: 'result;
 
     /// Return an iterator over the pairs of (index, element) in this stable vec.
-    fn iter<'this>(&'this self) -> impl '_ + Iterator<Item = (Index, &Data)>
+    fn iter<'this>(&'this self) -> impl 'this + Iterator<Item = (Index, &'this Data)>
     where
         Data: 'this;
 
     /// Return an iterator over the pairs of (index, element) in this stable vec.
-    fn iter_mut<'this>(&'this mut self) -> impl '_ + Iterator<Item = (Index, &mut Data)>
+    fn iter_mut<'this>(&'this mut self) -> impl 'this + Iterator<Item = (Index, &'this mut Data)>
     where
         Data: 'this;
 
     /// Return an iterator over the elements in this stable vec.
-    fn iter_elements<'this>(&'this self) -> impl '_ + Iterator<Item = &Data>
+    fn iter_elements<'this>(&'this self) -> impl 'this + Iterator<Item = &'this Data>
     where
         Data: 'this,
     {
@@ -115,7 +114,7 @@ pub trait StableVec<Data, Index: StableVecIndex>:
     }
 
     /// Return an iterator over the elements in this stable vec.
-    fn iter_elements_mut<'this>(&'this mut self) -> impl '_ + Iterator<Item = &mut Data>
+    fn iter_elements_mut<'this>(&'this mut self) -> impl 'this + Iterator<Item = &'this mut Data>
     where
         Data: 'this,
     {
@@ -123,7 +122,7 @@ pub trait StableVec<Data, Index: StableVecIndex>:
     }
 
     /// Return an iterator over the indices that are currently valid for this stable vec.
-    fn iter_indices<'this>(&'this self) -> impl '_ + Iterator<Item = Index>
+    fn iter_indices<'this>(&'this self) -> impl 'this + Iterator<Item = Index>
     where
         Data: 'this,
     {
@@ -138,6 +137,7 @@ pub trait StableVec<Data, Index: StableVecIndex>:
 }
 
 /// The interface that describes methods to access elements inside a stable vector.
+///
 /// This is separate from the [`StableVec`] trait to allow creating views of a stable vector that do not allow insertion or deletion, but still grants mutable access to contained elements.
 pub trait StableVecAccess<Data, Index> {
     /// Get a reference to the element at the given index.
