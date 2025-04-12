@@ -5,8 +5,8 @@ use std::mem;
 use crate::error::Result;
 
 /// The interface that defines the full functionality of a stable vector.
-pub trait StableVec<Data, Index: StableVecIndex>:
-    StableVecAccess<Data, Index> + From<Vec<Data>> + IntoIterator<Item = Data> + FromIterator<Data>
+pub trait StableVec<Index: StableVecIndex, Data>:
+    StableVecAccess<Index, Data> + From<Vec<Data>> + IntoIterator<Item = Data> + FromIterator<Data>
 {
     /// Insert a single element into the stable vector at an arbitrary index.
     /// Return the index.
@@ -139,7 +139,7 @@ pub trait StableVec<Data, Index: StableVecIndex>:
 /// The interface that describes methods to access elements inside a stable vector.
 ///
 /// This is separate from the [`StableVec`] trait to allow creating views of a stable vector that do not allow insertion or deletion, but still grants mutable access to contained elements.
-pub trait StableVecAccess<Data, Index> {
+pub trait StableVecAccess<Index, Data> {
     /// Get a reference to the element at the given index.
     /// If the index is not mapped to an element, an [`Error::UnmappedIndex`](crate::error::Error::UnmappedIndex) is returned.
     fn get(&self, index: Index) -> Result<&Data>;

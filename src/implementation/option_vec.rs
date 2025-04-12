@@ -19,13 +19,13 @@ mod available_insertion_index_iterator;
 /// Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 /// This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct OptionStableVec<Data, Index> {
+pub struct OptionStableVec<Index, Data> {
     vec: Vec<Option<Data>>,
     free_list: Vec<usize>,
     phantom_data: PhantomData<Index>,
 }
 
-impl<Data, Index> OptionStableVec<Data, Index> {
+impl<Index, Data> OptionStableVec<Index, Data> {
     /// Create a new empty [`OptionStableVec`].
     pub fn new() -> Self {
         Self {
@@ -36,7 +36,7 @@ impl<Data, Index> OptionStableVec<Data, Index> {
     }
 }
 
-impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Data, Index> {
+impl<Index: StableVecIndex, Data> StableVec<Index, Data> for OptionStableVec<Index, Data> {
     fn insert(&mut self, element: Data) -> Index {
         let index = if let Some(index) = self.free_list.pop() {
             self.vec[index] = Some(element);
@@ -151,7 +151,7 @@ impl<Data, Index: StableVecIndex> StableVec<Data, Index> for OptionStableVec<Dat
     }
 }
 
-impl<Data, Index: StableVecIndex> StableVecAccess<Data, Index> for OptionStableVec<Data, Index> {
+impl<Index: StableVecIndex, Data> StableVecAccess<Index, Data> for OptionStableVec<Index, Data> {
     fn get(&self, index: Index) -> crate::error::Result<&Data> {
         let index = index.into();
         match self.vec.get(index) {
@@ -173,13 +173,13 @@ impl<Data, Index: StableVecIndex> StableVecAccess<Data, Index> for OptionStableV
     }
 }
 
-impl<Data, Index> Default for OptionStableVec<Data, Index> {
+impl<Index, Data> Default for OptionStableVec<Index, Data> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<Data: Clone, Index> Clone for OptionStableVec<Data, Index> {
+impl<Data: Clone, Index> Clone for OptionStableVec<Index, Data> {
     fn clone(&self) -> Self {
         Self {
             vec: self.vec.clone(),
@@ -189,21 +189,21 @@ impl<Data: Clone, Index> Clone for OptionStableVec<Data, Index> {
     }
 }
 
-impl<Data: Eq, Index> PartialEq for OptionStableVec<Data, Index> {
+impl<Data: Eq, Index> PartialEq for OptionStableVec<Index, Data> {
     fn eq(&self, other: &Self) -> bool {
         self.vec == other.vec
     }
 }
 
-impl<Data: Eq, Index> Eq for OptionStableVec<Data, Index> {}
+impl<Data: Eq, Index> Eq for OptionStableVec<Index, Data> {}
 
-impl<Data, Index> From<Vec<Data>> for OptionStableVec<Data, Index> {
+impl<Index, Data> From<Vec<Data>> for OptionStableVec<Index, Data> {
     fn from(value: Vec<Data>) -> Self {
         value.into_iter().collect()
     }
 }
 
-impl<Data, Index> IntoIterator for OptionStableVec<Data, Index> {
+impl<Index, Data> IntoIterator for OptionStableVec<Index, Data> {
     type Item = Data;
     type IntoIter = iter::Flatten<vec::IntoIter<Option<Data>>>;
 
@@ -212,7 +212,7 @@ impl<Data, Index> IntoIterator for OptionStableVec<Data, Index> {
     }
 }
 
-impl<Data, Index> FromIterator<Data> for OptionStableVec<Data, Index> {
+impl<Index, Data> FromIterator<Data> for OptionStableVec<Index, Data> {
     fn from_iter<T: IntoIterator<Item = Data>>(iter: T) -> Self {
         Self {
             vec: iter.into_iter().map(Some).collect(),
@@ -222,7 +222,7 @@ impl<Data, Index> FromIterator<Data> for OptionStableVec<Data, Index> {
     }
 }
 
-impl<Data: Debug, Index: StableVecIndex> Debug for OptionStableVec<Data, Index> {
+impl<Data: Debug, Index: StableVecIndex> Debug for OptionStableVec<Index, Data> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "OptionStableVec [")?;
 
