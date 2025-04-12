@@ -18,6 +18,7 @@ mod available_insertion_index_iterator;
 ///
 /// Each element is stored as an `Option`, and a free list is used to keep track of "holes" in the vector.
 /// This allows amortised O(1) insertions and deletions, with a memory usage of O(|maximum len|).
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OptionStableVec<Data, Index> {
     vec: Vec<Option<Data>>,
     free_list: Vec<usize>,
