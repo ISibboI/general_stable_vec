@@ -1,6 +1,7 @@
 [package]
 name = "general_stable_vec"
 description = "A Vec implementation with stable indices"
+keywords = ["general", "generic", "stable", "vec"]
 repository = "https://github.com/ISibboI/general_stable_vec"
 version = "0.12.2"
 edition = "2021"
