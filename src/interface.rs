@@ -7,6 +7,9 @@ use crate::error::Result;
 /// The interface that defines the full functionality of a stable vector.
 pub trait StableVec<Index: StableVecIndex, Data>:
     StableVecAccess<Index, Data> + From<Vec<Data>> + IntoIterator<Item = Data> + FromIterator<Data>
+where
+    for<'a> &'a Self: IntoIterator<Item = &'a Data>,
+    for<'a> &'a mut Self: IntoIterator<Item = &'a mut Data>,
 {
     /// Insert a single element into the stable vector at an arbitrary index.
     /// Return the index.

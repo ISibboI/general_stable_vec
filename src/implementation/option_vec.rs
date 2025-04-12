@@ -212,6 +212,24 @@ impl<Index, Data> IntoIterator for OptionStableVec<Index, Data> {
     }
 }
 
+impl<'a, Index, Data> IntoIterator for &'a OptionStableVec<Index, Data> {
+    type Item = &'a Data;
+    type IntoIter = std::iter::Flatten<std::slice::Iter<'a, std::option::Option<Data>>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.vec.iter().flatten()
+    }
+}
+
+impl<'a, Index, Data> IntoIterator for &'a mut OptionStableVec<Index, Data> {
+    type Item = &'a mut Data;
+    type IntoIter = std::iter::Flatten<std::slice::IterMut<'a, std::option::Option<Data>>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.vec.iter_mut().flatten()
+    }
+}
+
 impl<Index, Data> FromIterator<Data> for OptionStableVec<Index, Data> {
     fn from_iter<T: IntoIterator<Item = Data>>(iter: T) -> Self {
         Self {
