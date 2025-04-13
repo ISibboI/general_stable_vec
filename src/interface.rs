@@ -1,6 +1,6 @@
 //! The interfaces that describe a stable vector.
 
-use std::mem;
+use std::{mem, slice::SliceIndex};
 
 use crate::error::Result;
 
@@ -144,12 +144,23 @@ where
 /// This is separate from the [`StableVec`] trait to allow creating views of a stable vector that do not allow insertion or deletion, but still grants mutable access to contained elements.
 pub trait StableVecAccess<Index, Data> {
     /// Get a reference to the element at the given index.
+    ///
     /// If the index is not mapped to an element, an [`Error::UnmappedIndex`](crate::error::Error::UnmappedIndex) is returned.
     fn get(&self, index: Index) -> Result<&Data>;
 
     /// Get a mutable reference to the element at the given index.
+    ///
     /// If the index is not mapped to an element, an [`Error::UnmappedIndex`](crate::error::Error::UnmappedIndex) is returned.
     fn get_mut(&mut self, index: Index) -> Result<&mut Data>;
+
+    /// Get mutable references to the elements at a set of disjoined indices.
+    ///
+    /// If any index is not mapped to an element, an [`Error::UnmappedIndex`](crate::error::Error::UnmappedIndex) is returned.
+    /// If any pair of indices is equal, an [`Error::OverlappingIndices`](crate::error::Error::OverlappingIndices) is returned.
+    fn get_disjoint_mut<const N: usize>(
+        &mut self,
+        indices: [Index; N],
+    ) -> Result<[&mut <usize as SliceIndex<[Data]>>::Output; N]>;
 
     /// Return the number of elements in the stable vector.
     fn len(&self) -> usize;

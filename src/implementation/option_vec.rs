@@ -168,6 +168,23 @@ impl<Index: StableVecIndex, Data> StableVecAccess<Index, Data> for OptionStableV
         }
     }
 
+    fn get_disjoint_mut<const N: usize>(
+        &mut self,
+        indices: [Index; N],
+    ) -> crate::error::Result<[&mut <usize as std::slice::SliceIndex<[Data]>>::Output; N]> {
+        let indices: [usize; N] = indices.map(Into::into);
+
+        // Check for index errors ahead of time, such that we always know which index is the problem.
+        for index in indices {
+            if !matches!(self.vec.get(index), Some(Some(_))) {
+                return Err(Error::UnmappedIndex { index });
+            }
+        }
+
+        let elements = self.vec.get_disjoint_mut(indices)?;
+        Ok(elements.map(|element| element.as_mut().unwrap()))
+    }
+
     fn len(&self) -> usize {
         self.vec.len() - self.free_list.len()
     }

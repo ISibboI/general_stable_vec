@@ -1,5 +1,7 @@
 //! Errors and related types.
 
+use std::slice::GetDisjointMutError;
+
 use thiserror::Error;
 
 /// The error type.
@@ -11,6 +13,10 @@ pub enum Error {
         /// The index.
         index: usize,
     },
+
+    /// The given indices contain an overlapping pair of indices.
+    #[error("the given indices contain an overlapping pair of indices")]
+    OverlappingIndices,
 
     /// The given index is already mapped to an element.
     #[error("the given index {index} is already mapped to an element")]
@@ -29,6 +35,17 @@ pub enum Error {
         /// The given invalid insertion index.
         actual_index: usize,
     },
+}
+
+impl From<GetDisjointMutError> for Error {
+    fn from(value: GetDisjointMutError) -> Self {
+        match value {
+            GetDisjointMutError::IndexOutOfBounds => {
+                unreachable!("We always want to report the index")
+            }
+            GetDisjointMutError::OverlappingIndices => Self::OverlappingIndices,
+        }
+    }
 }
 
 /// A shortcut result type using this crate's error type.
